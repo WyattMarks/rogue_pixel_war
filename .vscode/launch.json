@@ -1,0 +1,22 @@
+{
+	"configurations": [
+		{
+			"type": "lua-local",
+			"request": "launch",
+			"name": "Debug Client",
+			"program": {
+				"command": "/usr/bin/love"
+			},
+			"args": ["${workspaceFolder}"]
+		},
+		{
+			"type": "lua-local",
+			"request": "launch",
+			"name": "Debug Server",
+			"program": {
+				"command": "/usr/bin/love"
+			},
+			"args": ["${workspaceFolder}/server"]
+		},
+	]
+}
