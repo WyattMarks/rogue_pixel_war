@@ -1,5 +1,6 @@
 local ghud = {}
 ghud.items = {}
+ghud.sprite_groups = {}
 ghud.tile_size = 32
 
 
@@ -42,6 +43,9 @@ function ghud:load()
 	self.texture_width, self.texture_height = self.texture:getDimensions()
 
 	self.spriteBatch = love.graphics.newSpriteBatch(self.texture, 1024)
+
+	self.empty_space = love.graphics.newQuad( self.tile_map.empty_space[1], self.tile_map.empty_space[2],
+		self.tile_map.empty_space[3], self.tile_map.empty_space[4], self.texture_width, self.texture_height )
 end
 
 function ghud:draw()
@@ -54,6 +58,30 @@ function ghud:add_item(type, parameters)
 	self.items[#self.items+1] = item
 
 	return item
+end
+
+function ghud:add_to_spritebatch(quad, x, y, group, reuse)
+	if not self.sprite_groups[group] then
+		self.sprite_groups[group] = {index = 1, ids = {}}
+	end
+
+	if reuse then
+		if self.sprite_groups[group].index >= #self.sprite_groups[group].ids then
+			self.sprite_groups[group].ids[#self.sprite_groups[group].ids + 1] = self.spriteBatch:add(quad, x, y)
+			self.sprite_groups[group].index = self.sprite_groups[group].index + 1
+		else
+			self.spriteBatch:set(self.sprite_groups[group].ids[self.sprite_groups[group].index], quad, x, y)
+			self.sprite_groups[group].index = self.sprite_groups[group].index + 1
+		end
+	else
+		self.sprite_groups[group].ids[#self.sprite_groups[group].ids + 1] = self.spriteBatch:add(quad, x, y)
+	end
+end
+
+function ghud:clear_spritebatch_group(group)
+	for i=self.sprite_groups[group].index, #self.sprite_groups[group].ids do
+		self.spriteBatch:set(self.sprite_groups[group].ids[i], self.empty_space, 0, 0)
+	end
 end
 
 function ghud:update(dt)

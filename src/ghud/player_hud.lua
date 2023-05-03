@@ -1,6 +1,4 @@
 local player_hud = {}
-player_hud.bar_ids = {}
-player_hud.bar_index = 1
 
 function player_hud:generate_bars(reuse_ids)
 	local tile_info = self.tile_map.hud_bar_empty1
@@ -41,34 +39,17 @@ function player_hud:generate_bars(reuse_ids)
 	self:generate_bar(self.x + 84, self.y + 42, ply.xp/ply.max_xp, self.xp_bar1, self.xp_bar2, self.xp_bar_cap, reuse_ids)
 
 	if reuse_ids then
-		for i=self.bar_index, #self.bar_ids do
-			self.spriteBatch:set(self.bar_ids[i], self.empty_space, 0, 0)
-		end
-	end
-
-	self.bar_index = 1
-end
-
-function player_hud:add_to_spritebatch(quad, x, y, reuse_ids)
-	if reuse_ids then
-		if self.bar_index >= #self.bar_ids then
-			self.bar_ids[#self.bar_ids + 1] = self.spriteBatch:add(quad, x, y)
-			self.bar_index = self.bar_index + 1
-		else
-			self.spriteBatch:set(self.bar_ids[self.bar_index], quad, x, y)
-			self.bar_index = self.bar_index + 1
-		end
-	else
-		self.bar_ids[#self.bar_ids + 1] = self.spriteBatch:add(quad, x, y)
+		ghud:clear_spritebatch_group('bar')
 	end
 end
+
 
 function player_hud:generate_bar(x, y, amount, bar1, bar2, cap, reuse_ids)
 	for i = 0, 19 do
 		if i == 0 then
-			self:add_to_spritebatch(self.bar_empty1, x + i * 8, y + 2, reuse_ids)
+			ghud:add_to_spritebatch(self.bar_empty1, x + i * 8, y + 2, 'bar', reuse_ids)
 		else
-			self:add_to_spritebatch(self.bar_empty2, x + i * 8, y + 2, reuse_ids)
+			ghud:add_to_spritebatch(self.bar_empty2, x + i * 8, y + 2, 'bar', reuse_ids)
 		end
 	end
 
@@ -77,9 +58,9 @@ function player_hud:generate_bar(x, y, amount, bar1, bar2, cap, reuse_ids)
 		end_x = x + i * 8
 
 		if i == 0 then
-			self:add_to_spritebatch(bar1, end_x, y + 4, reuse_ids)
+			ghud:add_to_spritebatch(bar1, end_x, y + 4, 'bar', reuse_ids)
 		else
-			self:add_to_spritebatch(bar2, end_x, y + 4, reuse_ids)
+			ghud:add_to_spritebatch(bar2, end_x, y + 4, 'bar', reuse_ids)
 		end
 	end
 
@@ -87,11 +68,11 @@ function player_hud:generate_bar(x, y, amount, bar1, bar2, cap, reuse_ids)
 	local pixels_left = math.floor((amount * 20 - math.floor(amount * 20)) * 8)
 	if pixels_left > 0 then
 		bar2:setViewport(map_x, map_y, pixels_left, map_h) --boldly assuming that we have > 1 bar of amount
-		self:add_to_spritebatch(bar2, end_x+8, y + 4, reuse_ids) -- e.g. if we had 1 health this would render bar2 instead of bar1
+		ghud:add_to_spritebatch(bar2, end_x+8, y + 4, 'bar', reuse_ids) -- e.g. if we had 1 health this would render bar2 instead of bar1
 		bar2:setViewport(map_x, map_y, map_w, map_h)
 	end
 
-	self:add_to_spritebatch(cap, x + 160, y, reuse_ids)
+	ghud:add_to_spritebatch(cap, x + 160, y, 'bar', reuse_ids)
 end
 
 function player_hud:new(ghud, parameters)
