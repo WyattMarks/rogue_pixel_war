@@ -33,6 +33,8 @@ function player:load()
 		self.color = {r = 50, g = 50, b = 255}
 	end
 
+	if server then return end
+
 	self.animator = animator:new("player/player-spritemap-v9", 8, -12)
 	self.animator:load_texture("armor/robe01-spritemap-v9")
 	self.animator:load_state('running_right', 0, 3, 46, 50, 8)
@@ -73,7 +75,7 @@ end
 
 function player:update(dt)
 	if self.health == 0 then return end
-	self.animator:update(dt)
+	if not server then self.animator:update(dt) end
 	local distance = self.speed * dt
 	-- If we are moving diagonally then we should move half as much per direction
 	if (self.right or self.left) and (self.up or self.down) and not (self.right and self.left) and not (self.up and self.down) then
@@ -83,36 +85,40 @@ function player:update(dt)
 	local oldx, oldy = self.x, self.y
 
 	if self.right and not self.left then
-		self.animator:set_state('running_right')
+		if not server then self.animator:set_state('running_right') end
 		self.x = self.x + distance
 	end
 
 	if self.left and not self.right then
-		self.animator:set_state('running_left')
+		if not server then self.animator:set_state('running_left') end
 		self.x = self.x - distance
 	end
 
 	if self.up and not self.down then
 		self.y = self.y - distance
 
-		if self.animator.current_state == 'idle_right' then
-			self.animator:set_state('running_right')
-		elseif self.animator.current_state == 'idle_left' then
-			self.animator:set_state('running_left')
+		if not server then 
+			if self.animator.current_state == 'idle_right' then
+				self.animator:set_state('running_right')
+			elseif self.animator.current_state == 'idle_left' then
+				self.animator:set_state('running_left')
+			end
 		end
 	end
 
 	if self.down and not self.up then
 		self.y = self.y + distance
 
-		if self.animator.current_state == 'idle_right' then
-			self.animator:set_state('running_right')
-		elseif self.animator.current_state == 'idle_left' then
-			self.animator:set_state('running_left')
+		if not server then 
+			if self.animator.current_state == 'idle_right' then
+				self.animator:set_state('running_right')
+			elseif self.animator.current_state == 'idle_left' then
+				self.animator:set_state('running_left')
+			end
 		end
 	end
 
-	if self.x == oldx and self.y == oldy then
+	if not server and self.x == oldx and self.y == oldy then
 		if self.animator.current_state == 'running_right' then
 			self.animator:set_state('idle_right')
 		elseif self.animator.current_state == 'running_left' then
