@@ -1,5 +1,6 @@
 local debug = {}
 debug.on = true
+debug.hitboxes = true
 debug.variables = {}
 debug.log = {}
 debug.font = {}

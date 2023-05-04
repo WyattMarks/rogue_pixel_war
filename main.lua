@@ -15,6 +15,7 @@ cbor.set_nil('null')
 font = require("src/gui/font")
 debugger = require("src/gui/debug") --lol debug global name is taken 
 button = require("src/gui/button")
+animator = require("src/util/animator")
 menu = require("src/menu")
 game = require("src/game")
 input = require("src/input/input")

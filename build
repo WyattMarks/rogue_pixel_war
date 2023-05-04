@@ -1,0 +1,5 @@
+#!/bin/sh
+
+rm rogue_pixel_war.love
+zip -r rogue_pixel_war.love ./
+
