@@ -37,14 +37,26 @@ function player:load()
 
 	self.animator = animator:new("player/player-spritemap-v9", 8, -12)
 	self.animator:load_texture("armor/robe01-spritemap-v9")
+	self.animator:load_texture("weapons/staff-attack-01-60x30")
+	
 	self.animator:load_state('running_right', 0, 3, 46, 50, 8)
-	self.animator:load_state('running_left', 0, 3, 46, 50, 8, {mirror=true})
+	self.animator:mirror_state('running_right', 'running_left')
+
 	self.animator:load_state('idle_right', 0, 0, 46, 50, 1, {frametime=10})
-	self.animator:load_state('idle_left', 0, 0, 46, 50, 1, {frametime=10, mirror=true})
+	self.animator:set_frame_information("idle_right", 3, 1, 180, 0, 60, 30)
+	self.animator:mirror_state('idle_right', 'idle_left')
+
 	self.animator:load_state('crouch_right', 1, 0, 46, 50, 1, {frametime=10})
-	self.animator:load_state('crouch_left', 1, 0, 46, 50, 1, {frametime=10, mirror=true})
+	self.animator:mirror_state("crouch_right", "crouch_left")
+
 	self.animator:load_state('attack_right', 2, 0, 46, 50, 4, {frametime=0.1, replay=false})
-	self.animator:load_state('attack_left', 2, 0, 46, 50, 4, {frametime=0.1, mirror=true, replay=false})
+	self.animator:set_frame_information("attack_right", 3, 1, 0, 0, 60, 30)
+	self.animator:set_frame_information("attack_right", 3, 2, 60, 0, 60, 30)
+	self.animator:set_frame_information("attack_right", 3, 3, 120, 0, 60, 30)
+	self.animator:set_frame_information("attack_right", 3, 4, 126, -2, 60, 30)
+	self.animator:mirror_state("attack_right", "attack_left")
+
+
 	self.animator:set_state('idle_right')
 	self.animator:set_default('idle_right')
 end

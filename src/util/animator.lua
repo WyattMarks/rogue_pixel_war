@@ -23,10 +23,10 @@ end
 
 function animator:load_texture(source)
 	if not source then source = self.source end
-	self.layers[#self.layers+1] = {}
+	self.layers[#self.layers+1] = {states={}}
 	self.layers[#self.layers].texture = love.graphics.newImage("assets/" .. source .. ".png")
 	self.layers[#self.layers].texture:setFilter("nearest", "nearest")
-	self.texture_width, self.texture_height = self.layers[#self.layers].texture:getDimensions()
+	self.layers[#self.layers].texture_width, self.layers[#self.layers].texture_height = self.layers[#self.layers].texture:getDimensions()
 
 	self.layers[#self.layers].spriteBatch = love.graphics.newSpriteBatch(self.layers[#self.layers].texture, 256) -- enough, i guess?
 end
@@ -38,12 +38,34 @@ function animator:load_state(state_name, start_frame, row, frame_width, frame_he
 	if kwargs.replay == nil then kwargs.replay = true end
 
 	self.auto_x_offset = -frame_width/2
-	print(self.auto_x_offset)
 
 	self.states[state_name] = {frametime=kwargs.frametime, mirror=kwargs.mirror, replay = kwargs.replay}
-	for i=1, number_of_frames do
-		self.states[state_name][i] = love.graphics.newQuad((i - 1 + start_frame) * frame_width, row * frame_height,
-			frame_width, frame_height, self.texture_width, self.texture_height)
+	for k,v in pairs(self.layers) do
+		v.states[state_name] = {}
+		for i=1, number_of_frames do
+			v.states[state_name][i] = love.graphics.newQuad((i - 1 + start_frame) * frame_width, row * frame_height,
+				frame_width, frame_height, v.texture_width, v.texture_height)
+		end
+	end
+end
+
+function animator:set_frame_information(state_name, layer_index, frame_number, x_pos, y_pos, frame_width, frame_height)
+	self.layers[layer_index].states[state_name][frame_number] = love.graphics.newQuad(x_pos, y_pos,
+		frame_width, frame_height, self.layers[layer_index].texture_width, self.layers[layer_index].texture_height)
+end
+
+function animator:mirror_state(original_state, new_state)
+	self.states[new_state] = {
+		mirror = not self.states[original_state].mirror,
+		frametime = self.states[original_state].frametime,
+		replay = self.states[original_state].replay
+	}
+
+	for k,v in pairs(self.layers) do
+		v.states[new_state] = {}
+		for i=1, #v.states[original_state] do
+			v.states[new_state][i] = v.states[original_state][i]
+		end
 	end
 end
 
@@ -52,9 +74,9 @@ function animator:set_frame()
 	if self.states[self.current_state].mirror then sx = -1 end
 	for k, layer in pairs(self.layers) do
 		if layer.quad_id == nil then
-			layer.quad_id = layer.spriteBatch:add(self.states[self.current_state][self.current_frame], 0, 0, 0, sx, 1)
+			layer.quad_id = layer.spriteBatch:add(layer.states[self.current_state][self.current_frame], 0, 0, 0, sx, 1)
 		else
-			layer.spriteBatch:set(layer.quad_id, self.states[self.current_state][self.current_frame], 0, 0, 0, sx, 1)
+			layer.spriteBatch:set(layer.quad_id, layer.states[self.current_state][self.current_frame], 0, 0, 0, sx, 1)
 		end
 	end
 end
@@ -67,6 +89,7 @@ function animator:set_state(state_name, kwargs)
 
 	self.current_state = state_name
 	self.current_frame = 1
+	self.last_frame_change = 0
 	self:set_frame()
 end
 
@@ -91,7 +114,7 @@ function animator:update(dt)
 	if self.last_frame_change > self.states[self.current_state].frametime then
 		self.last_frame_change = 0
 
-		self.current_frame = (self.current_frame + 1) % (#self.states[self.current_state] + 1)
+		self.current_frame = (self.current_frame + 1) % (#self.layers[1].states[self.current_state] + 1)
 		if self.current_frame == 0 then
 			self.current_frame = 1
 
