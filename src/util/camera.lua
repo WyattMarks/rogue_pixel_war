@@ -95,7 +95,7 @@ function camera:update(dt)
 end
 
 function camera:screen_to_world(screen_x, screen_y)
-	return screen_x + self.x, screen_y + self.y
+	return screen_x * self.x_scale + self.x, screen_y * self.y_scale + self.y
 end
 
 
