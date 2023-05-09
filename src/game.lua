@@ -11,6 +11,7 @@ function game:load(name)
 	debugger:print("Starting game...")
 	player = require("src/player")
 	camera = require("src/util/camera")
+	camera:scale(1, 1)
 	game_binds = require("src/input/game")
 	enet = require("enet")
 	network = require("src/network")
@@ -18,6 +19,7 @@ function game:load(name)
 	chatbox = require("src/gui/chatbox")
 	zombie = require("src/entities/zombie")
 	bullet = require("src/entities/bullet")
+	fireball = require("src/entities/fireball")
 	hud = require("src/gui/hud")
 	ghud = require("src/ghud/ghud")
 
@@ -25,6 +27,7 @@ function game:load(name)
 
 	self.entity_map['zombie'] = zombie
 	self.entity_map['bullet'] = bullet
+	self.entity_map['fireball'] = fireball
 
 	chatbox:load()
 

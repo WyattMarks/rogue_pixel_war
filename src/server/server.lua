@@ -107,7 +107,7 @@ function server:get_player(peer)
 end
 
 function server:shoot(peer, data)
-	b = bullet:new()
+	b = fireball:new()
 	b.x = data.x
 	b.y = data.y
 	b.vx = data.vx

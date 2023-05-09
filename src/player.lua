@@ -37,8 +37,9 @@ function player:load()
 
 	self.animator = animator:new("player/player-spritemap-v9", 8, -12)
 	self.animator:load_texture("armor/robe01-spritemap-v9")
-	self.animator:load_texture("weapons/staff-attack-01-60x30")
-	
+	self.animator:load_texture("weapons/staff-attack-02-60x30")
+	-- self.animator:load_texture("weapons/sword-slash-01-60x30")
+
 	self.animator:load_state('running_right', 0, 3, 46, 50, 8)
 	self.animator:mirror_state('running_right', 'running_left')
 
@@ -176,7 +177,7 @@ function player:shoot(down)
 	if self.health == 0 then return end
 
 	local x,y = camera:screen_to_world(love.mouse.getPosition())
-	local eX, eY = self.x + self.width / 2 - 4 / 2, self.y + self.height / 2 - 4 / 2
+	local eX, eY = self.x + self.width / 2 - 4 / 2, self.y
 	local angle = math.atan2(x - eX, y - eY)
 
 	if math.sin(angle) > 0 then

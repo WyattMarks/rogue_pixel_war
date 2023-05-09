@@ -16,7 +16,7 @@
 			"program": {
 				"command": "/usr/bin/love"
 			},
-			"args": ["${workspaceFolder}/server"]
+			"args": ["${workspaceFolder}/src/server"]
 		},
 	]
 }

@@ -7,10 +7,18 @@ animator.last_frame_change = 0
 animator.layers = {}
 
 function animator:new(source, x_offset, y_offset)
-	local new = {}
-	for k,v in pairs(self) do
-		new[k] = v
+	function copy(src)
+		local new = {}
+		for k,v in pairs(src) do
+			if type(v) == "table" then
+				new[k] = copy(v)
+			else
+				new[k] = v
+			end
+		end
+		return new
 	end
+	local new = copy(self)
 
 	new.source = source
 	new:load_texture()
@@ -42,10 +50,19 @@ function animator:load_state(state_name, start_frame, row, frame_width, frame_he
 	self.states[state_name] = {frametime=kwargs.frametime, mirror=kwargs.mirror, replay = kwargs.replay}
 	for k,v in pairs(self.layers) do
 		v.states[state_name] = {}
+		orig_start = start_frame
+		orig_row = row
 		for i=1, number_of_frames do
 			v.states[state_name][i] = love.graphics.newQuad((i - 1 + start_frame) * frame_width, row * frame_height,
 				frame_width, frame_height, v.texture_width, v.texture_height)
+
+			if (i + start_frame) * frame_width >= v.texture_width then
+				start_frame = start_frame - v.texture_width / frame_width
+				row = row + 1
+			end
 		end
+		start_frame = orig_start
+		row = orig_row
 	end
 end
 
@@ -100,11 +117,13 @@ end
 function animator:draw(x, y)
 	love.graphics.setColor(255,255,255)
 	local offset = self.x_offset + self.auto_x_offset
+	local rotation = self.r or 0
 	if self.states[self.current_state].mirror then
 		offset = self.x_offset - self.auto_x_offset
+		rotation = rotation * -1
 	end
 	for k,layer in pairs(self.layers) do
-		love.graphics.draw(layer.spriteBatch, x + offset, y + self.y_offset)
+		love.graphics.draw(layer.spriteBatch, x + offset, y + self.y_offset, rotation)
 	end
 end
 

@@ -1,6 +1,6 @@
 local debug = {}
 debug.on = true
-debug.hitboxes = true
+debug.hitboxes = false
 debug.variables = {}
 debug.log = {}
 debug.font = {}

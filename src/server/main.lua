@@ -13,6 +13,7 @@ package.path = package.path .. ";.."
 player = require("src/player")
 zombie = require("src/entities/zombie")
 bullet = require("src/entities/bullet")
+fireball = require("src/entities/fireball")
 cbor = require("src/thirdparty/cbor");
 cbor.set_float('double')
 cbor.set_nil('null')
