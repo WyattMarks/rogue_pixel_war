@@ -89,6 +89,11 @@ end
 function player:update(dt)
 	if self.health == 0 then return end
 	if not server then self.animator:update(dt) end
+
+	if not server and self:attacking() then
+		return -- Rest of function is movement code, we're not moving
+	end
+
 	local distance = self.speed * dt
 	-- If we are moving diagonally then we should move half as much per direction
 	if (self.right or self.left) and (self.up or self.down) and not (self.right and self.left) and not (self.up and self.down) then
@@ -172,9 +177,20 @@ function player:damage(damage)
 	end
 end
 
+function player:attacking()
+	local old = self._attacking
+	self._attacking = self.animator.current_state == 'attack_right' or self.animator.current_state == 'attack_left'
+
+	if old and not self._attacking then
+		self:send_input_state()
+	end
+	return self._attacking
+end
+
 function player:shoot(down)
 	if not down then return end
 	if self.health == 0 then return end
+	if self:attacking() then return end
 
 	local x,y = camera:screen_to_world(love.mouse.getPosition())
 	local eX, eY = self.x + self.width / 2 - 4 / 2, self.y

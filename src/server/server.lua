@@ -118,7 +118,14 @@ function server:shoot(peer, data)
 	b:load(util:generate_id())
 	b:update(love.timer.getTime() - data.time)
 
-	server:broadcast(packet_types.SHOOT, {right=data.vx>0, player=peer:connect_id()}, {self:get_player(peer)})
+	local ply = self:get_player(peer)
+
+	server:broadcast(packet_types.SHOOT, {right=data.vx>0, player=peer:connect_id()}, {ply})
+
+	ply.right = false
+	ply.left = false
+	ply.up = false
+	ply.down = false
 end
 
 function server:update(dt)
