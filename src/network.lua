@@ -1,6 +1,6 @@
 local network = {}
 
-network.address = "localhost"
+network.address = "23.84.33.179"
 network.port = 1337
 network.ready = false
 network.queue = {}
@@ -87,6 +87,17 @@ function network:player_data(data)
 	end
 end
 
+function network:shoot(data)
+	player = self:get_player(data.player)
+	if data.right then
+		player.animator:set_state('attack_right', {override=true})
+		player.animator:set_default('idle_right')
+	else
+		player.animator:set_state('attack_left', {override=true})
+		player.animator:set_default('idle_left')
+	end
+end
+
 function network:update(dt)
 	local event = self.host:service()
 
@@ -116,8 +127,10 @@ function network:update(dt)
 				game:remove_entity(packet.data)
 			elseif packet.packet_type == self.packet_types.ANNOUNCEMENT then
 				hud:announce(packet.data.msg)
+			elseif packet.packet_type == self.packet_types.SHOOT then
+				self:shoot(packet.data)
 			else
-				print(packet.data)
+				debugger:print('Unknown packet: ' .. packet.data)
 			end
 		elseif event.type == 'disconnect' then 
 			error("Network error: "..tostring(event.data))

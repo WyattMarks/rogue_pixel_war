@@ -6,7 +6,7 @@ animator.current_frame = 1
 animator.last_frame_change = 0
 animator.layers = {}
 
-function animator:new(source, x_offset, y_offset)
+function animator:new(source, x_offset, y_offset, use_auto_offset)
 	function copy(src)
 		local new = {}
 		for k,v in pairs(src) do
@@ -25,6 +25,12 @@ function animator:new(source, x_offset, y_offset)
 
 	new.x_offset = x_offset
 	new.y_offset = y_offset
+
+	if use_auto_offset ~= nil then
+		new.auto_offset = use_auto_offset
+	else
+		new.auto_offset = true
+	end
 
 	return new
 end
@@ -45,7 +51,11 @@ function animator:load_state(state_name, start_frame, row, frame_width, frame_he
 	kwargs.frametime = kwargs.frametime or 0.1
 	if kwargs.replay == nil then kwargs.replay = true end
 
-	self.auto_x_offset = -frame_width/2
+	if self.auto_offset then
+		self.auto_x_offset = -frame_width/2
+	else
+		self.auto_x_offset = 0
+	end
 
 	self.states[state_name] = {frametime=kwargs.frametime, mirror=kwargs.mirror, replay = kwargs.replay}
 	for k,v in pairs(self.layers) do
@@ -120,7 +130,7 @@ function animator:draw(x, y)
 	local rotation = self.r or 0
 	if self.states[self.current_state].mirror then
 		offset = self.x_offset - self.auto_x_offset
-		rotation = rotation * -1
+		rotation = -rotation
 	end
 	for k,layer in pairs(self.layers) do
 		love.graphics.draw(layer.spriteBatch, x + offset, y + self.y_offset, rotation)

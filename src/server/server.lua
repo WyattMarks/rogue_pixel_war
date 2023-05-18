@@ -114,10 +114,11 @@ function server:shoot(peer, data)
 	b.vy = data.vy
 	b.peer = peer
 
-	b:update(love.timer.getTime() - data.time)
-
 	self.entities[#self.entities+1] = b
 	b:load(util:generate_id())
+	b:update(love.timer.getTime() - data.time)
+
+	server:broadcast(packet_types.SHOOT, {right=data.vx>0, player=peer:connect_id()}, {self:get_player(peer)})
 end
 
 function server:update(dt)
