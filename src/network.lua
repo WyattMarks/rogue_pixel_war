@@ -85,6 +85,10 @@ function network:player_data(data)
 	if data.health then
 		player:damage(player.health - data.health)
 	end
+
+	if data.xp then
+		player:reward((data.level - player.level) * player.max_xp + data.xp - player.xp)
+	end
 end
 
 function network:shoot(data)

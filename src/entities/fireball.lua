@@ -102,7 +102,7 @@ function fireball:update(dt, process_only)
 			for k,ent in pairs(server.entities) do
 				if bit.band(self.damages_mask, ent.damage_mask) == self.damages_mask then
 					if util:colliding_rot(self, ent) then
-						ent:damage(self.damage)
+						ent:damage(self.damage, self)
 						server:broadcast(packet_types.ENTITY_DEATH, {id=self.id})
 						server:remove_entity(self.id)
 					end

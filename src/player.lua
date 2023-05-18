@@ -14,11 +14,12 @@ player.up = false
 player.down = false
 player.health = 150
 player.damage_mask = 2
-player.xp = 2.5
+player.xp = 0
 player.max_xp = 100
-player.mana = 50
+player.mana = 100
 player.max_mana = 100
 player.mana_recovery = 10
+player.level = 1
 
 function player:new()
 	local new = {}
@@ -176,6 +177,19 @@ function player:damage(damage)
 				end
 			end
 		end
+	end
+end
+
+function player:reward(xp)
+	self.xp = self.xp + xp
+
+	if self.xp >= self.max_xp then
+		self.xp = self.xp - self.max_xp
+		self.level = self.level + 1
+	end
+
+	if server then
+		server:broadcast(packet_types.PLAYER_DATA, {xp = self.xp, player=self.peer:connect_id(), level=self.level})
 	end
 end
 

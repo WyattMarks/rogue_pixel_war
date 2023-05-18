@@ -16,6 +16,7 @@ zombie.attack_cooldown = 0.5
 zombie.damage_mask = 1
 zombie.damages_mask = 2
 zombie.collision_mask = 1
+zombie.reward = 10
 
 zombie.stuck_counter = 0
 
@@ -141,7 +142,7 @@ function zombie:send_state(data)
 	server:broadcast(packet_types.ENTITY_DATA, data)
 end
 
-function zombie:damage(damage)
+function zombie:damage(damage, dealer)
 	self.health = math.max(0, self.health - damage)
 	if server then
 		self:send_state({health = self.health})
@@ -149,6 +150,7 @@ function zombie:damage(damage)
 		if self.health == 0 then
 			server:broadcast(packet_types.ENTITY_DEATH, {id=self.id})
 			server:remove_entity(self.id)
+			server:get_player(dealer.peer):reward(self.reward)
 		end
 	end
 end
