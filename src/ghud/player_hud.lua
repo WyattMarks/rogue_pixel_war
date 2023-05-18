@@ -1,4 +1,5 @@
 local player_hud = {}
+player_hud.num_bars = 20
 
 function player_hud:generate_bars(reuse_ids)
 	local tile_info = self.tile_map.hud_bar_empty1
@@ -54,7 +55,7 @@ function player_hud:generate_bar(x, y, amount, bar1, bar2, cap, reuse_ids)
 	end
 
 	local end_x = x
-	for i = 0, 20 * amount - 1 do
+	for i = 0, self.num_bars * amount - 1 do
 		end_x = x + i * 8
 
 		if i == 0 then
@@ -64,12 +65,18 @@ function player_hud:generate_bar(x, y, amount, bar1, bar2, cap, reuse_ids)
 		end
 	end
 
-	local map_x, map_y, map_w, map_h = bar2:getViewport()
-	local pixels_left = math.floor((amount * 20 - math.floor(amount * 20)) * 8)
+
+	local pixels_left = math.floor((amount * self.num_bars - math.floor(amount * self.num_bars)) * 8)
 	if pixels_left > 0 then
-		bar2:setViewport(map_x, map_y, pixels_left, map_h) --boldly assuming that we have > 1 bar of amount
-		ghud:add_to_spritebatch(bar2, end_x+8, y + 4, 'bar', reuse_ids) -- e.g. if we had 1 health this would render bar2 instead of bar1
-		bar2:setViewport(map_x, map_y, map_w, map_h)
+		local bar = bar2
+		if amount < 1 / self.num_bars then
+			end_x = end_x - 8
+			bar = bar1
+		end
+		local map_x, map_y, map_w, map_h = bar:getViewport()
+		bar:setViewport(map_x, map_y, pixels_left, map_h)
+		ghud:add_to_spritebatch(bar, end_x+8, y + 4, 'bar', reuse_ids)
+		bar:setViewport(map_x, map_y, map_w, map_h)
 	end
 
 	ghud:add_to_spritebatch(cap, x + 160, y, 'bar', reuse_ids)
