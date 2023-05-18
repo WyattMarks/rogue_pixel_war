@@ -14,10 +14,11 @@ player.up = false
 player.down = false
 player.health = 150
 player.damage_mask = 2
-player.xp = 77.5
+player.xp = 2.5
 player.max_xp = 100
 player.mana = 50
 player.max_mana = 100
+player.mana_recovery = 10
 
 function player:new()
 	local new = {}
@@ -89,6 +90,7 @@ end
 function player:update(dt)
 	if self.health == 0 then return end
 	if not server then self.animator:update(dt) end
+	self.mana = math.min(self.mana + self.mana_recovery * dt, self.max_mana)
 
 	if not server and self:attacking() then
 		return -- Rest of function is movement code, we're not moving
@@ -191,6 +193,12 @@ function player:shoot(down)
 	if not down then return end
 	if self.health == 0 then return end
 	if self:attacking() then return end
+
+	if self.mana > 20 then
+		self.mana = self.mana - 20
+	else
+		return
+	end
 
 	local x,y = camera:screen_to_world(love.mouse.getPosition())
 	local eX, eY = self.x + self.width / 2 - 4 / 2, self.y
